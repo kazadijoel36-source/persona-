@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  const API_BASE = window.PERSONAOS_API_BASE || "[https://persona-8xev.onrender.com](https://persona-8xev.onrender.com)";
+  const API_BASE ="https://persona-8xev.onrender.com";
 
   const TIER_LABELS = { free: "Free", starter: "Starter", creator: "Creator", pro: "Pro" };
 
