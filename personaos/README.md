@@ -32,7 +32,7 @@ Leave this running. It creates `personaos.db` (SQLite) automatically on
 first launch — no manual migration step. Confirm it's up:
 
 ```bash
-curl http://localhost:8000/health
+curl [https://persona-8xev.onrender.com](https://persona-8xev.onrender.com)
 # {"status":"ok"}
 ```
 
