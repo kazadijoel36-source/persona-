@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PersonaOS — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .dash-grid {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .dash-grid .span-2 { grid-column: 1 / -1; }
+  @media (max-width: 760px) { .dash-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body data-page="dashboard">
+
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="logo mono"><span class="dot"></span>PERSONAOS</div>
+      <nav>
+        <a href="index.html" data-nav="workspace">Workspace</a>
+        <a href="dashboard.html" data-nav="dashboard" class="active">Dashboard</a>
+        <a href="settings.html" data-nav="settings">Settings</a>
+      </nav>
+      <div class="flex gap-sm center">
+        <div class="balance-pill mono" data-balance-pill></div>
+        <a href="#" data-logout class="dim" style="font-size:12px">Sign out</a>
+      </div>
+    </div>
+
+    <div id="dashboardRoot" class="dash-grid">
+
+      <!-- Profile Strength -->
+      <div class="panel sharp panel-body">
+        <div class="stat-label">Profile Strength</div>
+        <div id="strengthBig" class="stat-big accent">—</div>
+        <div id="sparklineHolder" style="margin-top:14px"></div>
+        <p class="dim" style="font-size:12px;margin-top:8px">Climbs each time you lock in a rewrite.</p>
+      </div>
+
+      <!-- Usage -->
+      <div class="panel sharp panel-body">
+        <div class="flex between center" style="margin-bottom:2px">
+          <div class="stat-label">Usage This Cycle</div>
+          <span id="usageTier" class="badge">—</span>
+        </div>
+        <div class="usage-row">
+          <span class="mono"><span id="usageUsed">0</span> used</span>
+          <span class="mono"><span id="usageCap">0</span> cap</span>
+        </div>
+        <div class="usage-track"><div id="usageFill" class="usage-fill" style="width:0%"></div></div>
+        <a href="settings.html" class="dim" style="font-size:12px">Manage plan →</a>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="panel sharp span-2">
+        <div class="panel-header">
+          <h3>Calibration Chart</h3>
+          <span class="eyebrow">Formality · Directness · Warmth · Variance · Vocab</span>
+        </div>
+        <div class="panel-body" style="display:flex;justify-content:center">
+          <div id="radarHolder" style="width:300px;height:300px"></div>
+        </div>
+      </div>
+
+      <!-- Consistency log -->
+      <div class="panel sharp span-2">
+        <div class="panel-header">
+          <h3>Consistency Log</h3>
+          <span class="eyebrow">What taught the model what</span>
+        </div>
+        <div id="calLog"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>

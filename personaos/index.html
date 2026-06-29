@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PersonaOS — Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .workspace-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 220px 1fr 1fr;
+    min-height: 0;
+  }
+  .left-rail {
+    border-right: 1px solid var(--border);
+    padding: 18px 14px;
+    overflow-y: auto;
+  }
+  .left-rail h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); margin-bottom: 10px; }
+  .left-rail .rail-item {
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .left-rail .rail-item:hover { background: var(--panel); color: var(--text); }
+  .left-rail .rail-item.current { background: var(--accent-dim); color: var(--accent); }
+
+  .pane { display: flex; flex-direction: column; min-height: 0; }
+  .pane-input { border-right: 1px solid var(--border); }
+  .pane-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .pane-body { flex: 1; padding: 18px 20px; overflow-y: auto; display: flex; flex-direction: column; }
+
+  #rawInput {
+    flex: 1;
+    min-height: 220px;
+    background: transparent;
+    border: none;
+    font-size: 14.5px;
+    line-height: 1.6;
+    padding: 0;
+  }
+  #rawInput:focus { outline: none; }
+
+  .toolbar {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .toolbar-item { display: flex; flex-direction: column; gap: 6px; min-width: 130px; }
+  .toolbar select { padding: 7px 10px; font-size: 12px; }
+
+  #output {
+    flex: 1;
+    font-size: 14.5px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    display: none;
+  }
+  #outputEmpty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-faint);
+    font-size: 13px;
+    text-align: center;
+    padding: 0 30px;
+  }
+
+  .cal-section { padding: 16px 20px; border-top: 1px solid var(--border); display: none; }
+</style>
+</head>
+<body data-page="workspace">
+
+  <div class="app-shell">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="logo mono"><span class="dot"></span>PERSONAOS</div>
+      <nav>
+        <a href="index.html" data-nav="workspace" class="active">Workspace</a>
+        <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+        <a href="settings.html" data-nav="settings">Settings</a>
+      </nav>
+      <div class="flex gap-sm center">
+        <div class="balance-pill mono" data-balance-pill></div>
+        <a href="#" data-logout class="dim" style="font-size:12px">Sign out</a>
+      </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="workspace-grid">
+
+      <!-- LEFT RAIL -->
+      <div class="left-rail">
+        <h4>Personas</h4>
+        <a class="rail-item current">Default Voice</a>
+        <a class="rail-item faint" style="opacity:0.5">+ New persona (Pro)</a>
+
+        <h4 style="margin-top:24px">Recent Drafts</h4>
+        <a class="rail-item">Client follow-up — Tue</a>
+        <a class="rail-item">LinkedIn post draft</a>
+        <a class="rail-item">Investor update</a>
+      </div>
+
+      <!-- INPUT PANE -->
+      <div class="pane pane-input">
+        <div class="pane-header">
+          <h3 class="eyebrow" style="font-size:11px">Raw Input</h3>
+          <span id="inputCount" class="mono faint" style="font-size:12px">0 words</span>
+        </div>
+        <div class="pane-body">
+          <textarea id="rawInput" placeholder="Dump your thoughts here. Don't write it well — just write it."></textarea>
+        </div>
+        <div class="toolbar">
+          <div class="toolbar-item">
+            <label class="field-label">Tone</label>
+            <input type="range" id="toneSlider" min="0" max="100" value="50" />
+          </div>
+          <div class="toolbar-item">
+            <label class="field-label">Format</label>
+            <select id="formatSelect">
+              <option value="email">Email</option>
+              <option value="post">Social Post</option>
+              <option value="message">Message</option>
+              <option value="report">Report</option>
+            </select>
+          </div>
+          <button id="generateBtn" class="btn btn-primary" style="margin-left:auto">Generate →</button>
+        </div>
+      </div>
+
+      <!-- OUTPUT PANE -->
+      <div class="pane pane-output">
+        <div class="pane-header">
+          <h3 class="eyebrow" style="font-size:11px">Polished Output</h3>
+          <span class="badge badge-accent">Default Voice</span>
+        </div>
+        <div class="pane-body">
+          <div id="outputEmpty">Output appears here, mirrored against your raw input,<br/>so you can see exactly what changed.</div>
+          <div id="output"></div>
+        </div>
+        <div id="calMeter" class="cal-section">
+          <label class="field-label">Calibration</label>
+          <div class="cal-meter">
+            <button class="seg" data-direction="-1">Off</button>
+            <button class="seg" data-direction="0">Close</button>
+            <button class="seg" data-direction="1">Locked In</button>
+          </div>
+          <div id="calConfirm" class="cal-confirm mono"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>
