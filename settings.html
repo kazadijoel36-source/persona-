@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PersonaOS — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .settings-col {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  .modal-box { width: 100%; max-width: 380px; padding: 22px; }
+</style>
+</head>
+<body data-page="settings">
+
+  <div class="app-shell">
+    <div class="topbar">
+      <div class="logo mono"><span class="dot"></span>PERSONAOS</div>
+      <nav>
+        <a href="workspace.html" data-nav="workspace">Workspace</a>
+        <a href="dashboard.html" data-nav="dashboard">Dashboard</a>
+        <a href="settings.html" data-nav="settings" class="active">Settings</a>
+      </nav>
+      <div class="flex gap-sm center">
+        <div class="balance-pill mono" data-balance-pill></div>
+        <a href="#" data-logout class="dim" style="font-size:12px">Sign out</a>
+      </div>
+    </div>
+
+    <div class="settings-col">
+
+      <div>
+        <h1 style="font-size:18px;font-weight:600;margin-bottom:4px">Data &amp; Privacy</h1>
+        <p class="dim" style="font-size:13px">Your writing. Your profile. Export or delete it at any time.</p>
+      </div>
+
+      <!-- Source texts -->
+      <div class="panel sharp">
+        <div class="panel-header">
+          <h3>Source Text on File</h3>
+          <span class="eyebrow">Used to train your profile</span>
+        </div>
+        <div id="sourceList"></div>
+      </div>
+
+      <!-- Export -->
+      <div class="panel sharp panel-body flex between center">
+        <div>
+          <h3 style="font-size:13px;font-weight:500;margin-bottom:4px">Export Voice Profile</h3>
+          <p class="dim" style="font-size:12px">Download your full profile as a JSON file.</p>
+        </div>
+        <button id="exportBtn" class="btn btn-ghost">Export .json</button>
+      </div>
+
+      <!-- Delete -->
+      <div class="panel sharp panel-body flex between center" style="border-color:var(--danger)">
+        <div>
+          <h3 style="font-size:13px;font-weight:500;margin-bottom:4px">Delete Profile</h3>
+          <p class="dim" style="font-size:12px">Permanently erases your Voice Profile and source text. Cannot be undone.</p>
+        </div>
+        <button id="deleteBtn" class="btn btn-danger">Delete</button>
+      </div>
+
+      <!-- Billing -->
+      <div class="panel sharp">
+        <div class="panel-header"><h3>Plan</h3></div>
+        <div class="panel-body" style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" onclick="PersonaAPI.upgradeTier('free').then(()=>location.reload())">Free</button>
+          <button class="btn" onclick="PersonaAPI.upgradeTier('starter').then(()=>location.reload())">Starter — $5</button>
+          <button class="btn" onclick="PersonaAPI.upgradeTier('creator').then(()=>location.reload())">Creator — $10</button>
+          <button class="btn btn-primary" onclick="PersonaAPI.upgradeTier('pro').then(()=>location.reload())">Pro — $15/mo</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div id="deleteModal" class="modal-backdrop">
+    <div class="panel sharp modal-box">
+      <h3 style="font-size:14px;margin-bottom:8px">Delete your Voice Profile?</h3>
+      <p class="dim" style="font-size:12px;margin-bottom:18px">
+        This removes your calibration history, source text, and strength score. You'll start over from onboarding.
+      </p>
+      <div class="flex gap-sm">
+        <button id="cancelDelete" class="btn btn-ghost btn-block">Cancel</button>
+        <button id="confirmDelete" class="btn btn-danger btn-block">Delete permanently</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>

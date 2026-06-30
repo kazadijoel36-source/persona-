@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PersonaOS — Calibration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .onboard-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .onboard-card {
+    width: 100%;
+    max-width: 520px;
+  }
+  .progress-track {
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 28px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 33%;
+    transition: width 0.25s linear;
+  }
+  textarea#ingestText { height: 200px; font-family: var(--font-mono); font-size: 13px; }
+</style>
+</head>
+<body data-page="onboarding">
+
+  <div class="onboard-shell">
+    <div class="onboard-card">
+
+      <div class="flex between center" style="margin-bottom:18px">
+        <div class="logo mono"><span class="dot"></span>PERSONAOS</div>
+        <span id="progressLabel" class="eyebrow">Step 1 of 3</span>
+      </div>
+
+      <div class="progress-track sharp"><div id="progressFill" class="progress-fill"></div></div>
+
+      <!-- STEP 1 — INGEST -->
+      <div data-step="1">
+        <h1 style="font-size:20px;font-weight:600;margin-bottom:6px">Show us how you write.</h1>
+        <p class="dim" style="margin-bottom:20px;font-size:13px">
+          Paste a few past emails, posts, or messages. We're analyzing structure — sentence
+          length, vocabulary, cadence — not content.
+        </p>
+        <div class="panel sharp" style="padding:2px">
+          <textarea id="ingestText" placeholder="Paste your writing here. The more natural, the better — unedited drafts work best."></textarea>
+        </div>
+        <div class="flex between center" style="margin-top:10px">
+          <span id="ingestCount" class="mono faint" style="font-size:12px">0 words ingested</span>
+          <span class="mono faint" style="font-size:12px">Minimum 40 words</span>
+        </div>
+        <button id="toStep2" class="btn btn-primary btn-block" style="margin-top:20px" disabled>
+          Continue →
+        </button>
+      </div>
+
+      <!-- STEP 2 — CALIBRATION MCQs -->
+      <div data-step="2" style="display:none">
+        <h1 style="font-size:20px;font-weight:600;margin-bottom:6px">Quick calibration.</h1>
+        <p class="dim" style="margin-bottom:20px;font-size:13px">
+          Four forced choices, pulled from real phrasing. Pick whichever feels more like you —
+          there's no wrong answer.
+        </p>
+        <div id="pairContainer" class="panel sharp panel-body"></div>
+        <button id="toStep3" class="btn btn-primary btn-block" style="margin-top:20px" disabled>
+          Reveal my profile →
+        </button>
+      </div>
+
+      <!-- STEP 3 — PROFILE REVEAL -->
+      <div data-step="3" style="display:none">
+        <h1 style="font-size:20px;font-weight:600;margin-bottom:6px">Your Voice Profile is live.</h1>
+        <p class="dim" style="margin-bottom:20px;font-size:13px">
+          This is your starting calibration. It sharpens every time you lock in a rewrite.
+        </p>
+
+        <div class="panel sharp" style="padding:20px;text-align:center;margin-bottom:16px">
+          <div class="stat-label">Profile Strength</div>
+          <div id="strengthValue" class="stat-big accent">41%</div>
+        </div>
+
+        <div class="panel sharp" style="padding:10px 0 4px;display:flex;justify-content:center">
+          <div id="radarHolder" style="width:260px;height:260px"></div>
+        </div>
+
+        <button id="finishOnboarding" class="btn btn-primary btn-block" style="margin-top:20px">
+          Enter Workspace →
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>

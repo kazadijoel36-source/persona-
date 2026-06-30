@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PersonaOS — Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .login-shell {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .login-card { width: 100%; max-width: 380px; }
+</style>
+</head>
+<body data-page="login">
+
+  <div class="login-shell">
+    <div class="login-card">
+
+      <div class="logo mono" style="margin-bottom:28px;justify-content:center;display:flex">
+        <span class="dot"></span>PERSONAOS
+      </div>
+
+      <h1 id="formTitle" style="font-size:18px;font-weight:600;margin-bottom:4px;text-align:center">Sign in</h1>
+      <p class="dim" style="font-size:13px;margin-bottom:22px;text-align:center">Your writing engine, calibrated to you.</p>
+
+      <p id="bonusBanner" class="mono" style="display:none;font-size:12px;text-align:center;margin-bottom:16px;padding:10px;border:1px solid var(--accent);color:var(--accent);border-radius:var(--radius)">
+        Create an account to keep your draft + claim 500 bonus words, free.
+      </p>
+
+      <div class="panel sharp panel-body flex-col gap-sm">
+        <div>
+          <label class="field-label">Email</label>
+          <input type="text" id="emailInput" placeholder="you@company.com" autocomplete="username" />
+        </div>
+        <div>
+          <label class="field-label">Password</label>
+          <input type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div id="authError" class="danger mono" style="font-size:12px;min-height:14px"></div>
+        <button id="submitBtn" class="btn btn-primary btn-block">Sign in →</button>
+      </div>
+
+      <p class="dim" style="font-size:12px;margin-top:16px;text-align:center">
+        <span id="toggleText">New here?</span>
+        <a href="#" id="toggleModeLink" class="accent">Create an account</a>
+      </p>
+
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let mode = "login";
+
+    const titleEl = document.getElementById("formTitle");
+    const toggleText = document.getElementById("toggleText");
+    const toggleLink = document.getElementById("toggleModeLink");
+    const submitBtn = document.getElementById("submitBtn");
+    const errorEl = document.getElementById("authError");
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const bonusBanner = document.getElementById("bonusBanner");
+
+    // Show the bonus-words banner whenever there's an unclaimed trial
+    // session sitting in localStorage from the landing page.
+    if (localStorage.getItem("personaos_anon_session")) {
+      bonusBanner.style.display = "block";
+    }
+
+    function setMode(next) {
+      mode = next;
+      errorEl.textContent = "";
+      if (mode === "login") {
+        titleEl.textContent = "Sign in";
+        submitBtn.textContent = "Sign in →";
+        toggleText.textContent = "New here?";
+        toggleLink.textContent = "Create an account";
+      } else {
+        titleEl.textContent = "Create your account";
+        submitBtn.textContent = "Create account →";
+        toggleText.textContent = "Already have one?";
+        toggleLink.textContent = "Sign in";
+      }
+    }
+
+    toggleLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      setMode(mode === "login" ? "register" : "login");
+    });
+
+    function submit() {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      errorEl.textContent = "";
+
+      if (!email || password.length < 8) {
+        errorEl.textContent = "Enter a valid email and an 8+ character password.";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Working…";
+
+      const call = mode === "login" ? PersonaAPI.login(email, password) : PersonaAPI.register(email, password);
+
+      call
+        .then(() => {
+          // Whether register or login, the destination is decided the same
+          // way: if the profile already has a strength score (either from
+          // resuming an existing account, or because register() just
+          // migrated a pre-signup anon trial's calibration), skip straight
+          // to the Workspace instead of re-running onboarding.
+          return PersonaAPI.getProfile().then((profile) => {
+            window.location.href = profile.strength > 0 ? "workspace.html" : "onboarding.html";
+          });
+        })
+        .catch((err) => {
+          errorEl.textContent = err.message || "Something went wrong.";
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          setMode(mode); // restores correct button label
+        });
+    }
+
+    submitBtn.addEventListener("click", submit);
+    passwordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submit();
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "register") setMode("register");
+  </script>
+</body>
+</html>

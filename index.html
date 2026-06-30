@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PersonaOS — Write like you, instantly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  .landing-shell { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
+  .landing-hero { text-align: center; margin-bottom: 28px; }
+  .landing-hero h1 { font-size: 26px; font-weight: 600; margin-bottom: 8px; }
+  .landing-hero p { font-size: 14px; }
+
+  .trial-pill {
+    display: flex; align-items: center; gap: 10px; justify-content: center;
+    font-size: 12px; margin-bottom: 22px;
+  }
+  .trial-track { width: 160px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .trial-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s; }
+  .trial-fill.warn { background: var(--danger); }
+
+  #miniOnboard .pair-option { text-align: left; justify-content: flex-start; padding: 12px 14px; }
+
+  textarea#landingInput { height: 160px; font-size: 14.5px; line-height: 1.6; }
+  #landingOutput { white-space: pre-wrap; font-size: 14.5px; line-height: 1.7; padding: 16px; }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+    display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px;
+  }
+  .modal-box { width: 100%; max-width: 460px; padding: 26px; }
+  .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
+  .plan-card { padding: 14px; text-align: left; }
+  .plan-card .plan-price { font-size: 18px; font-weight: 600; margin: 4px 0; }
+</style>
+</head>
+<body data-page="landing">
+
+  <div class="topbar">
+    <div class="logo mono"><span class="dot"></span>PERSONAOS</div>
+    <nav></nav>
+    <div class="flex gap-sm center">
+      <a href="login.html" class="dim" style="font-size:12px">Sign in</a>
+      <a href="login.html?mode=register" class="btn btn-primary btn-sm">Create account</a>
+    </div>
+  </div>
+
+  <div class="landing-shell">
+
+    <div class="landing-hero">
+      <h1>Write like you. Instantly.</h1>
+      <p class="dim">Paste a rough draft, get it back in your voice. No sign-up required to try it — start typing below.</p>
+    </div>
+
+    <div class="trial-pill mono">
+      <span class="dim">Free trial:</span>
+      <span class="trial-track"><span id="trialFill" class="trial-fill"></span></span>
+      <span id="trialLabel" class="faint">1,000 words free</span>
+    </div>
+
+    <!-- MINI ONBOARDING — shown once, before first generation -->
+    <div id="miniOnboard" class="panel sharp panel-body" style="margin-bottom:18px">
+      <p class="eyebrow" style="margin-bottom:6px">Quick calibration (optional)</p>
+      <p class="dim" style="font-size:13px;margin-bottom:16px">Pick whichever feels closer to how you'd actually phrase things. Two questions — makes your first result much better.</p>
+      <div id="pairContainer" class="flex-col gap-sm"></div>
+      <button id="skipOnboard" class="btn btn-ghost btn-sm" style="margin-top:14px">Skip — generate with default voice →</button>
+    </div>
+
+    <!-- GENERATE PANEL -->
+    <div id="generatePanel" class="panel sharp" style="display:none">
+      <div class="panel-header">
+        <h3 style="font-size:13px">Dump your draft</h3>
+        <span id="inputCount" class="mono faint" style="font-size:12px">0 words</span>
+      </div>
+      <div class="panel-body">
+        <textarea id="landingInput" placeholder="Don't write it well — just write it. We'll polish it in your voice."></textarea>
+      </div>
+      <div class="flex between center" style="padding:14px 18px;border-top:1px solid var(--border)">
+        <select id="formatSelect" style="padding:7px 10px;font-size:12px">
+          <option value="email">Email</option>
+          <option value="post">Social Post</option>
+          <option value="message">Message</option>
+          <option value="report">Report</option>
+        </select>
+        <button id="generateBtn" class="btn btn-primary">Generate →</button>
+      </div>
+    </div>
+
+    <div id="outputWrap" style="display:none;margin-top:18px">
+      <div class="panel sharp">
+        <div class="panel-header"><h3 style="font-size:13px">Your draft, in your voice</h3></div>
+        <div id="landingOutput"></div>
+      </div>
+      <div class="flex center" style="margin-top:16px">
+        <a href="login.html?mode=register" class="btn btn-primary btn-block" style="max-width:340px">Sign up free — save this + claim 500 bonus words →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PRICING / SOFT-GATE MODAL -->
+  <div id="pricingModal" class="modal-backdrop">
+    <div class="panel sharp modal-box">
+      <h3 style="font-size:16px;margin-bottom:4px">You've used your 1,000 free words</h3>
+      <p class="dim" style="font-size:13px">Create a free account to keep going — you'll get <strong>500 bonus words</strong> immediately, and your draft + calibration carry over.</p>
+
+      <div class="plan-grid">
+        <div class="panel sharp plan-card">
+          <div class="eyebrow">Starter</div>
+          <div class="plan-price">$5</div>
+          <div class="dim" style="font-size:12px">10,000 words, one-time pack</div>
+        </div>
+        <div class="panel sharp plan-card">
+          <div class="eyebrow">Creator</div>
+          <div class="plan-price">$10</div>
+          <div class="dim" style="font-size:12px">25,000 words, one-time pack</div>
+        </div>
+        <div class="panel sharp plan-card" style="grid-column:1/-1;border-color:var(--accent)">
+          <div class="eyebrow accent">Pro</div>
+          <div class="plan-price">$15<span class="faint" style="font-size:12px">/mo</span></div>
+          <div class="dim" style="font-size:12px">30,000 words every month, multiple personas</div>
+        </div>
+      </div>
+
+      <a href="login.html?mode=register" class="btn btn-primary btn-block">Create free account →</a>
+      <button id="closePricing" class="btn btn-ghost btn-block" style="margin-top:8px">Not now</button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/landing.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>
